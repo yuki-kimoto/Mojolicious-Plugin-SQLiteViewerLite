@@ -1,4 +1,4 @@
-use Test::More;
+use Test::More 'no_plan';
 use strict;
 use warnings;
 use DBIx::Custom;
@@ -18,26 +18,8 @@ use Mojo::HelloWorld;
   }
 }
 
-my $database = $ENV{MOJOLICIOUS_PLUGIN_MYSQLVIEWERLITE_TEST_DATABASE}
-  // 'mojosqliteviewer';
-my $dsn = "dbi:mysql:database=$database";
-my $user = $ENV{MOJOLICIOUS_PLUGIN_MYSQLVIEWERLITE_TEST_USER}
-  // 'mojosqliteviewer';
-my $password = $ENV{MOJOLICIOUS_PLUGIN_MYSQLVIEWERLITE_TEST_PASSWORD}
-  // 'mojosqliteviewer';
-
-my $dbi;
-eval {
-  $dbi = DBIx::Custom->connect(
-    dsn => $dsn,
-    user => $user,
-    password => $password
-  );
-};
-
-plan skip_all => 'MySQL private test' if $@;
-
-plan 'no_plan';
+my $database = 'main';
+my $dbi = DBIx::Custom->connect(dsn => 'dbi:SQLite:dbname=:memory:');
 
 # Prepare database
 eval { $dbi->execute('drop table table1') };
@@ -46,24 +28,23 @@ eval { $dbi->execute('drop table table3') };
 
 $dbi->execute(<<'EOS');
 create table table1 (
-  column1_1 int,
-  column1_2 int,
-  primary key (column1_1)
-) engine=MyIsam charset=ujis;
+  column1_1 integer primary key not null,
+  column1_2
+);
 EOS
 
 $dbi->execute(<<'EOS');
 create table table2 (
-  column2_1 int not null,
-  column2_2 int not null
-) engine=InnoDB charset=utf8;
+  column2_1 not null,
+  column2_2 not null
+);
 EOS
 
 $dbi->execute(<<'EOS');
 create table table3 (
-  column3_1 int not null,
-  column3_2 int not null
-) engine=InnoDB;
+  column3_1 not null,
+  column3_2 not null
+);
 EOS
 
 $dbi->insert({column1_1 => 1, column1_2 => 2}, table => 'table1');
@@ -87,8 +68,7 @@ $t->get_ok("/sqliteviewerlite/tables?database=$database")
   ->content_like(qr/table2/)
   ->content_like(qr/table3/)
   ->content_like(qr/Show primary keys/)
-  ->content_like(qr/Show null allowed columns/)
-  ->content_like(qr/Show database engines/);
+  ->content_like(qr/Show null allowed columns/);
 $t->link_ok("/sqliteviewerlite/tables?database=$database");
 
 # Table page
@@ -123,8 +103,8 @@ $t->get_ok("/sqliteviewerlite/showcreatetables?database=$database")
 $t->get_ok("/sqliteviewerlite/showprimarykeys?database=$database")
   ->content_like(qr/Primary keys/)
   ->content_like(qr/table1/)
-  ->content_like(qr/\Q(`column1_1`)/)
-  ->content_unlike(qr/\Q(`column1_2`)/)
+  ->content_like(qr/\Q(column1_1)/)
+  ->content_unlike(qr/\Q(column1_2)/)
   ->content_like(qr/table2/)
   ->content_like(qr/table3/);
 
@@ -132,28 +112,10 @@ $t->get_ok("/sqliteviewerlite/showprimarykeys?database=$database")
 $t->get_ok("/sqliteviewerlite/shownullallowedcolumns?database=$database")
   ->content_like(qr/Null allowed column/)
   ->content_like(qr/table1/)
-  ->content_like(qr/\Q(`column1_2`)/)
+  ->content_like(qr/\Q(column1_2)/)
   ->content_like(qr/table2/)
-  ->content_unlike(qr/\Q(`column2_1`)/)
-  ->content_unlike(qr/\Q(`column2_2`)/)
-  ->content_like(qr/table3/);
-
-# Show Database engines page
-$t->get_ok("/sqliteviewerlite/showdatabaseengines?database=$database")
-  ->content_like(qr/Database engines/)
-  ->content_like(qr/table1/)
-  ->content_like(qr/\Q(MyISAM)/)
-  ->content_like(qr/table2/)
-  ->content_like(qr/\Q(InnoDB)/)
-  ->content_like(qr/table3/);
-
-# Show Charsets
-$t->get_ok("/sqliteviewerlite/showcharsets?database=$database")
-  ->content_like(qr/Charsets/)
-  ->content_like(qr/table1/)
-  ->content_like(qr/\Q(ujis)/)
-  ->content_like(qr/table2/)
-  ->content_like(qr/\Q(utf8)/)
+  ->content_unlike(qr/\Q(column2_1)/)
+  ->content_unlike(qr/\Q(column2_2)/)
   ->content_like(qr/table3/);
 
 # Other route and prefix
@@ -182,8 +144,7 @@ $t->get_ok("/other/tables?database=$database")
   ->content_like(qr/table2/)
   ->content_like(qr/table3/)
   ->content_like(qr/Show primary keys/)
-  ->content_like(qr/Show null allowed columns/)
-  ->content_like(qr/Show database engines/);
+  ->content_like(qr/Show null allowed columns/);
 $t->link_ok("/other/tables?database=$database");
 
 # Table page
@@ -207,8 +168,8 @@ $t->get_ok("/other/select?database=$database&table=table1")
 $t->get_ok("/other/showprimarykeys?database=$database")
   ->content_like(qr/Primary keys/)
   ->content_like(qr/table1/)
-  ->content_like(qr/\Q(`column1_1`)/)
-  ->content_unlike(qr/\Q(`column1_2`)/)
+  ->content_like(qr/\Q(column1_1)/)
+  ->content_unlike(qr/\Q(column1_2)/)
   ->content_like(qr/table2/)
   ->content_like(qr/table3/);
 
@@ -216,19 +177,9 @@ $t->get_ok("/other/showprimarykeys?database=$database")
 $t->get_ok("/other/shownullallowedcolumns?database=$database")
   ->content_like(qr/Null allowed column/)
   ->content_like(qr/table1/)
-  ->content_like(qr/\Q(`column1_2`)/)
+  ->content_like(qr/\Q(column1_2)/)
   ->content_like(qr/table2/)
-  ->content_unlike(qr/\Q(`column2_1`)/)
-  ->content_unlike(qr/\Q(`column2_2`)/)
+  ->content_unlike(qr/\Q(column2_1)/)
+  ->content_unlike(qr/\Q(column2_2)/)
   ->content_like(qr/table3/);
-
-# Show Database engines page
-$t->get_ok("/other/showdatabaseengines?database=$database")
-  ->content_like(qr/Database engines/)
-  ->content_like(qr/table1/)
-  ->content_like(qr/\Q(MyISAM)/)
-  ->content_like(qr/table2/)
-  ->content_like(qr/\Q(InnoDB)/)
-  ->content_like(qr/table3/);
-
 

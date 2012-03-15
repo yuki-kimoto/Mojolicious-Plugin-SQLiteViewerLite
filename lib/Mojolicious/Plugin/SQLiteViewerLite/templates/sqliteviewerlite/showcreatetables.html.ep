@@ -1,4 +1,4 @@
-% layout 'sqliteviewerlite_common', title => "Create tables in $database ";
+% layout 'sqliteviewerlite/common', title => "Create tables in $database ";
 % my $tables = [sort keys %$create_tables];
 <h2>Create tables in <i><%= $database %></i></h2>
 % for my $table (@$tables) {

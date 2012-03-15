@@ -7,7 +7,7 @@ use File::Basename 'dirname';
 use Cwd 'abs_path';
 use Mojolicious::Plugin::SQLiteViewerLite::Command;
 
-our $VERSION = '0.06';
+our $VERSION = '0.01';
 
 has 'prefix';
 has validator => sub {
@@ -34,18 +34,19 @@ sub register {
   my $dbh = $conf->{dbh};
   my $prefix = $conf->{prefix} // 'sqliteviewerlite';
   my $r = $conf->{route} // $app->routes;
-  
-  # Add Renderer path
-  $self->add_renderer_path($app->renderer);
-  
+
   # Set Attribute
   $self->dbi->dbh($dbh);
   $self->prefix($prefix);
   
+  # Add Renderer path
+  $self->add_renderer_path($app->renderer);
+  
   $r = $self->create_routes($r,
     namespace => 'Mojolicious::Plugin::SQLiteViewerLite',
     controller => 'controller',
-    plugin => $self
+    plugin => $self,
+    main_title => 'SQLite Viewer Lite'
   );
 }
 
@@ -81,7 +82,7 @@ sub create_routes {
 
 =head1 NAME
 
-Mojolicious::Plugin::SQLiteViewerLite - Mojolicious plugin to display mysql database information
+Mojolicious::Plugin::SQLiteViewerLite - Mojolicious plugin to display SQLite database information on browser
 
 =head1 SYNOPSYS
 
@@ -100,7 +101,7 @@ Mojolicious::Plugin::SQLiteViewerLite - Mojolicious plugin to display mysql data
 =head1 DESCRIPTION
 
 L<Mojolicious::Plugin::SQLiteViewerLite> is L<Mojolicious> plugin
-to display MySQL database information on your browser.
+to display SQLite database information on browser.
 
 L<Mojolicious::Plugin::SQLiteViewerLite> have the following features.
 
@@ -120,7 +121,7 @@ Select * from TABLE limit 0, 1000
 
 =item *
 
-Display C<primary keys>, C<null allowed columnes>, C<database engines> and C<charsets> in all tables.
+Display C<primary keys> and C<null allowed columnes> in all tables.
 
 =back
 

@@ -5,7 +5,7 @@
     % if (stash 'title') {
       <%= stash('title') %>
     % }
-    SQLite Vewer Lite
+    <%= $main_title %>
   </title>
   %= javascript '/js/jquery.js'
   %= stylesheet begin 
@@ -92,7 +92,7 @@
   
 </head>
 <body>
-  <h1><a href="<%= "/$prefix" %>">SQLite Viewer Lite</a></h1>
+  <h1><a href="<%= "/$prefix" %>"><%= $main_title %></a></h1>
   <hr>
   <div id="container">
     %= content;
