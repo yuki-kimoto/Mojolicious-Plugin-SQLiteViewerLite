@@ -42,7 +42,11 @@ sub register {
   $self->dbi->dbh($dbh);
   $self->prefix($prefix);
   
-  $r = $self->create_routes($r);
+  $r = $self->create_routes($r,
+    namespace => 'Mojolicious::Plugin::SQLiteViewerLite',
+    controller => 'controller',
+    plugin => $self
+  );
 }
 
 sub add_renderer_path {
@@ -55,27 +59,20 @@ sub add_renderer_path {
 }
 
 sub create_routes {
-  my ($self, $r) = @_;
+  my ($self, $r, %opt) = @_;
   
   my $prefix = $self->prefix;
 
-  # Top page
-  my %args = (
-    namespace => 'Mojolicious::Plugin::SQLiteViewerLite',
-    controller => 'sqliteviewerlite',
-    plugin => $self
-  );
-  
   # Routes
-  $r = $r->waypoint("/$prefix")->via('get')->to(%args, action => 'default');
-  $r->get('/tables')->to(%args, action => 'tables');
-  $r->get('/table')->to(%args, action => 'table');
-  $r->get('/showcreatetables')->to(%args, action => 'showcreatetables');
-  $r->get('/showprimarykeys')->to(%args, action => 'showprimarykeys');
-  $r->get('/shownullallowedcolumns')->to(%args, action => 'shownullallowedcolumns');
-  $r->get('/showdatabaseengines')->to(%args, action => 'showdatabaseengines');
-  $r->get('/showcharsets')->to(%args, action => 'showcharsets');
-  $r->get('/select')->to(%args, action => 'select');
+  $r = $r->waypoint("/$prefix")->via('get')->to(%opt, action => 'default');
+  $r->get('/tables')->to(%opt, action => 'tables');
+  $r->get('/table')->to(%opt, action => 'table');
+  $r->get('/showcreatetables')->to(%opt, action => 'showcreatetables');
+  $r->get('/showprimarykeys')->to(%opt, action => 'showprimarykeys');
+  $r->get('/shownullallowedcolumns')->to(%opt, action => 'shownullallowedcolumns');
+  $r->get('/showdatabaseengines')->to(%opt, action => 'showdatabaseengines');
+  $r->get('/showcharsets')->to(%opt, action => 'showcharsets');
+  $r->get('/select')->to(%opt, action => 'select');
 
   return $r;
 }
