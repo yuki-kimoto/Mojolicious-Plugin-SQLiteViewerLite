@@ -60,214 +60,24 @@ sub create_routes {
   my $prefix = $self->prefix;
 
   # Top page
-  # $r = $r->waypoint("/$prefix")->via('get')->to(cb => sub { $self->action_default(shift) });
-  $r = $r->waypoint("/$prefix")->via('get')->to(
+  my %args = (
     namespace => 'Mojolicious::Plugin::SQLiteViewerLite',
     controller => 'sqliteviewerlite',
-    action => 'default',
-    command => Mojolicious::Plugin::SQLiteViewerLite::Command->new(dbi => $self->dbi),
-    prefix => $prefix
+    plugin => $self
   );
   
-  # Tables
-  $r->get('/tables' => sub { $self->action_tables(shift) });
-  # Table
-  $r->get('/table' => sub { $self->action_table(shift) });
-
-  # Show create tables
-  $r->get('/showcreatetables' => sub { $self->action_showcreatetables(shift) });
-  # Show primary keys
-  $r->get('/showprimarykeys', sub { $self->action_showprimarykeys(shift) });
-  # Show null allowed columns
-  $r->get('/shownullallowedcolumns', sub { $self->action_shownullallowedcolumns(shift) });
-  # Show database engines
-  $r->get('/showdatabaseengines', sub { $self->action_showdatabaseengines(shift) });
-  # Show charsets
-  $r->get('/showcharsets', sub { $self->action_showcharsets(shift) });
-  
-  # Select
-  $r->get('/select', sub { $self->action_select(shift) });
+  # Routes
+  $r = $r->waypoint("/$prefix")->via('get')->to(%args, action => 'default');
+  $r->get('/tables')->to(%args, action => 'tables');
+  $r->get('/table')->to(%args, action => 'table');
+  $r->get('/showcreatetables')->to(%args, action => 'showcreatetables');
+  $r->get('/showprimarykeys')->to(%args, action => 'showprimarykeys');
+  $r->get('/shownullallowedcolumns')->to(%args, action => 'shownullallowedcolumns');
+  $r->get('/showdatabaseengines')->to(%args, action => 'showdatabaseengines');
+  $r->get('/showcharsets')->to(%args, action => 'showcharsets');
+  $r->get('/select')->to(%args, action => 'select');
 
   return $r;
-}
-
-sub action_default {
-  my ($self, $c) = @_;
-  
-  my $database = $self->command->show_databases;
-  my $current_database = $self->command->current_database;
-  
-  $c->render(
-    controller => 'sqliteviewerlite',
-    action => 'default',
-    prefix => $self->prefix,
-    databases => $database,
-    current_database => $current_database
-  );
-}
-
-sub action_tables {
-  my ($self, $c) = @_;
-  
-  my $params = $self->command->params($c);
-  my $rule = [
-    database => {default => ''} => [
-      'safety_name'
-    ] 
-  ];
-  my $vresult = $self->validator->validate($params, $rule);
-  my $database = $vresult->data->{database};
-  my $tables = $self->command->show_tables($database);
-  
-  return $c->render(
-    controller => 'sqliteviewerlite',
-    action => 'tables',
-    prefix => $self->prefix,
-    database => $database,
-    tables => $tables
-  );
-}
-
-sub action_table {
-  my ($self, $c) = @_;
-  
-  # Validation
-  my $params = $self->command->params($c);
-  my $rule = [
-    database => {default => ''} => [
-      'safety_name'
-    ],
-    table => {default => ''} => [
-      'safety_name'
-    ]
-  ];
-  my $vresult = $self->validator->validate($params, $rule);
-  my $database = $vresult->data->{database};
-  my $table = $vresult->data->{table};
-  
-  my $table_def = $self->command->show_create_table($database, $table);
-  return $c->render(
-    controller => 'sqliteviewerlite',
-    action => 'table',
-    prefix => $self->prefix,
-    database => $database,
-    table => $table, 
-    table_def => $table_def,
-  );
-}
-
-sub action_showcreatetables {
-  my ($self, $c) = @_;
-  
-  # Validation
-  my $params = $self->command->params($c);
-  my $rule = [
-    database => {default => ''} => [
-      'safety_name'
-    ]
-  ];
-  my $vresult = $self->validator->validate($params, $rule);
-  my $database = $vresult->data->{database};
-  my $tables = $self->command->show_tables($database);
-  
-  # Get create tables
-  my $create_tables = {};
-  for my $table (@$tables) {
-    $create_tables->{$table} = $self->command->show_create_table($database, $table);
-  }
-  
-  return $c->render(
-    controller => 'sqliteviewerlite',
-    action => 'showcreatetables',
-    prefix => $self->prefix,
-    database => $database,
-    create_tables => $create_tables
-  );
-}
-
-sub action_showprimarykeys {
-  my ($self, $c) = @_;
-  
-  # Validation
-  my $params = $self->command->params($c);
-  my $rule = [
-    database => {default => ''} => [
-      'safety_name'
-    ],
-  ];
-  my $vresult = $self->validator->validate($params, $rule);
-  my $database = $vresult->data->{database};
-  
-  # Get primary keys
-  my $primary_keys = $self->command->show_primary_keys($database);
-  
-  $c->render(
-    controller => 'sqliteviewerlite',
-    action => 'showprimarykeys',
-    prefix => $self->prefix,
-    database => $database,
-    primary_keys => $primary_keys
-  );
-}
-
-sub action_shownullallowedcolumns {
-  my ($self, $c) = @_;
-  
-  # Validation
-  my $params = $self->command->params($c);
-  my $rule = [
-    database => {default => ''} => [
-      'safety_name'
-    ],
-  ];
-  my $vresult = $self->validator->validate($params, $rule);
-  my $database = $vresult->data->{database};
-  
-  # Get null allowed columns
-  my $null_allowed_columns = $self->command->show_null_allowed_columns($database);
-  
-  $c->render(
-    controller => 'sqliteviewerlite',
-    action => 'shownullallowedcolumns',
-    prefix => $self->prefix,
-    database => $database,
-    null_allowed_columns => $null_allowed_columns
-  );
-}
-
-sub action_select {
-  my ($self, $c) = @_;
-  
-  # Validation
-  my $params = $self->command->params($c);
-  my $rule = [
-    database => {default => ''} => [
-      'safety_name'
-    ],
-    table => {default => ''} => [
-      'safety_name'
-    ]
-  ];
-  my $vresult = $self->validator->validate($params, $rule);
-  my $database = $vresult->data->{database};
-  my $table = $vresult->data->{table};
-  
-  # Get null allowed columns
-  my $result = $self->dbi->select(table => "$database.$table", append => 'limit 0, 1000');
-  my $header = $result->header;
-  my $rows = $result->fetch_all;
-  my $sql = $self->dbi->last_sql;
-  
-  $c->render(
-    controller => 'sqliteviewerlite',
-    action => 'select',
-    prefix => $self->prefix,
-    database => $database,
-    table => $table,
-    header => $header,
-    rows => $rows,
-    sql => $sql
-  );
 }
 
 1;
