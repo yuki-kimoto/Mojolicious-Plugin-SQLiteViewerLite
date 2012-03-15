@@ -46,6 +46,7 @@ sub register {
     namespace => 'Mojolicious::Plugin::SQLiteViewerLite',
     controller => 'controller',
     plugin => $self,
+    prefix => $self->prefix,
     main_title => 'SQLite Viewer Lite'
   );
 }

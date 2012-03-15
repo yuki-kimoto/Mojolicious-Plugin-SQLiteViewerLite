@@ -16,7 +16,6 @@ sub default {
   $self->render(
     databases => $database,
     current_database => $current_database,
-    prefix => $plugin->prefix
   );
 }
 
@@ -40,8 +39,6 @@ sub tables {
     unless $self->stash->{template};
 
   return $self->render(
-    controller => 'sqliteviewerlite',
-    prefix => $plugin->prefix,
     database => $database,
     tables => $tables
   );
@@ -73,8 +70,6 @@ sub table {
     unless $self->stash->{template};
 
   return $self->render(
-    controller => 'sqliteviewerlite',
-    prefix => $plugin->prefix,
     database => $database,
     table => $table, 
     table_def => $table_def,
@@ -108,8 +103,6 @@ sub showcreatetables {
     unless $self->stash->{template};
 
   $self->render(
-    controller => 'sqliteviewerlite',
-    prefix => $plugin->prefix,
     database => $database,
     create_tables => $create_tables
   );
@@ -138,8 +131,6 @@ sub showprimarykeys {
     unless $self->stash->{template};
 
   $self->render(
-    controller => 'sqliteviewerlite',
-    prefix => $plugin->prefix,
     database => $database,
     primary_keys => $primary_keys
   );
@@ -168,8 +159,6 @@ sub shownullallowedcolumns {
     unless $self->stash->{template};
 
   $self->render(
-    controller => 'sqliteviewerlite',
-    prefix => $plugin->prefix,
     database => $database,
     null_allowed_columns => $null_allowed_columns
   );
@@ -205,8 +194,6 @@ sub select {
     unless $self->stash->{template};
 
   $self->render(
-    controller => 'sqliteviewerlite',
-    prefix => $plugin->prefix,
     database => $database,
     table => $table,
     header => $header,
