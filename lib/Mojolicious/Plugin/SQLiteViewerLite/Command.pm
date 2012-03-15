@@ -3,6 +3,8 @@ use Mojo::Base -base;
 
 has 'dbi';
 
+sub current_database { 'main' }
+
 sub show_primary_keys {
   my ($self, $database) = @_;
 
