@@ -60,7 +60,15 @@ sub create_routes {
   my $prefix = $self->prefix;
 
   # Top page
-  $r = $r->waypoint("/$prefix")->via('get')->to(cb => sub { $self->action_default(shift) });
+  # $r = $r->waypoint("/$prefix")->via('get')->to(cb => sub { $self->action_default(shift) });
+  $r = $r->waypoint("/$prefix")->via('get')->to(
+    namespace => 'Mojolicious::Plugin::SQLiteViewerLite',
+    controller => 'sqliteviewerlite',
+    action => 'default',
+    command => Mojolicious::Plugin::SQLiteViewerLite::Command->new(dbi => $self->dbi),
+    prefix => $prefix
+  );
+  
   # Tables
   $r->get('/tables' => sub { $self->action_tables(shift) });
   # Table
