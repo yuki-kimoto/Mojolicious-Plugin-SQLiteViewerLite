@@ -108,4 +108,10 @@ EOS
   return $create_table;
 }
 
+sub params {
+  my ($self, $c) = @_;
+  my $params = {map {$_ => $c->param($_)} $c->param};
+  return $params;
+}
+
 1;

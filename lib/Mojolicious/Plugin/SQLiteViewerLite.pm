@@ -60,7 +60,7 @@ sub create_routes {
   my $prefix = $self->prefix;
 
   # Top page
-  $r = $r->waypoint("/$prefix")->via('get')->to(cb => sub { $self->action_index(shift) });
+  $r = $r->waypoint("/$prefix")->via('get')->to(cb => sub { $self->action_default(shift) });
   # Tables
   $r->get('/tables' => sub { $self->action_tables(shift) });
   # Table
@@ -83,16 +83,15 @@ sub create_routes {
   return $r;
 }
 
-sub action_index {
+sub action_default {
   my ($self, $c) = @_;
   
   my $database = $self->command->show_databases;
   my $current_database = $self->command->current_database;
   
-  $DB::single = 1;
   $c->render(
     controller => 'sqliteviewerlite',
-    action => 'index',
+    action => 'default',
     prefix => $self->prefix,
     databases => $database,
     current_database => $current_database
@@ -102,7 +101,7 @@ sub action_index {
 sub action_tables {
   my ($self, $c) = @_;
   
-  my $params = $self->params($c);
+  my $params = $self->command->params($c);
   my $rule = [
     database => {default => ''} => [
       'safety_name'
@@ -125,7 +124,7 @@ sub action_table {
   my ($self, $c) = @_;
   
   # Validation
-  my $params = $self->params($c);
+  my $params = $self->command->params($c);
   my $rule = [
     database => {default => ''} => [
       'safety_name'
@@ -153,7 +152,7 @@ sub action_showcreatetables {
   my ($self, $c) = @_;
   
   # Validation
-  my $params = $self->params($c);
+  my $params = $self->command->params($c);
   my $rule = [
     database => {default => ''} => [
       'safety_name'
@@ -182,7 +181,7 @@ sub action_showprimarykeys {
   my ($self, $c) = @_;
   
   # Validation
-  my $params = $self->params($c);
+  my $params = $self->command->params($c);
   my $rule = [
     database => {default => ''} => [
       'safety_name'
@@ -207,7 +206,7 @@ sub action_shownullallowedcolumns {
   my ($self, $c) = @_;
   
   # Validation
-  my $params = $self->params($c);
+  my $params = $self->command->params($c);
   my $rule = [
     database => {default => ''} => [
       'safety_name'
@@ -232,7 +231,7 @@ sub action_select {
   my ($self, $c) = @_;
   
   # Validation
-  my $params = $self->params($c);
+  my $params = $self->command->params($c);
   my $rule = [
     database => {default => ''} => [
       'safety_name'
@@ -261,12 +260,6 @@ sub action_select {
     rows => $rows,
     sql => $sql
   );
-}
-
-sub params {
-  my ($self, $c) = @_;
-  my $params = {map {$_ => $c->param($_)} $c->param};
-  return $params;
 }
 
 1;
