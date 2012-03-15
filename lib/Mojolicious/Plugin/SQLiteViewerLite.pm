@@ -5,6 +5,7 @@ use DBIx::Custom;
 use Validator::Custom;
 use File::Basename 'dirname';
 use Cwd 'abs_path';
+use Mojolicious::Plugin::SQLiteViewerLite::Command;
 
 our $VERSION = '0.06';
 
@@ -21,6 +22,11 @@ has validator => sub {
 };
 
 has dbi => sub { DBIx::Custom->new };
+
+has command => sub {
+  my $self = shift;
+  my $commond = Mojolicious::Plugin::SQLiteViewerLite::Command->new(dbi => $self->dbi);
+};
 
 # Viewer
 sub register {
@@ -80,7 +86,7 @@ sub create_routes {
 sub action_index {
   my ($self, $c) = @_;
   
-  my $database = $self->show_databases;
+  my $database = $self->command->show_databases;
   my $current_database = $self->current_database;
   
   $DB::single = 1;
@@ -104,7 +110,7 @@ sub action_tables {
   ];
   my $vresult = $self->validator->validate($params, $rule);
   my $database = $vresult->data->{database};
-  my $tables = $self->show_tables($database);
+  my $tables = $self->command->show_tables($database);
   
   return $c->render(
     controller => 'sqliteviewerlite',
@@ -132,7 +138,7 @@ sub action_table {
   my $database = $vresult->data->{database};
   my $table = $vresult->data->{table};
   
-  my $table_def = $self->show_create_table($database, $table);
+  my $table_def = $self->command->show_create_table($database, $table);
   return $c->render(
     controller => 'sqliteviewerlite',
     action => 'table',
@@ -155,12 +161,12 @@ sub action_showcreatetables {
   ];
   my $vresult = $self->validator->validate($params, $rule);
   my $database = $vresult->data->{database};
-  my $tables = $self->show_tables($database);
+  my $tables = $self->command->show_tables($database);
   
   # Get create tables
   my $create_tables = {};
   for my $table (@$tables) {
-    $create_tables->{$table} = $self->show_create_table($database, $table);
+    $create_tables->{$table} = $self->command->show_create_table($database, $table);
   }
   
   return $c->render(
@@ -186,7 +192,7 @@ sub action_showprimarykeys {
   my $database = $vresult->data->{database};
   
   # Get primary keys
-  my $primary_keys = $self->show_primary_keys($database);
+  my $primary_keys = $self->command->show_primary_keys($database);
   
   $c->render(
     controller => 'sqliteviewerlite',
@@ -211,7 +217,7 @@ sub action_shownullallowedcolumns {
   my $database = $vresult->data->{database};
   
   # Get null allowed columns
-  my $null_allowed_columns = $self->show_null_allowed_columns($database);
+  my $null_allowed_columns = $self->command->show_null_allowed_columns($database);
   
   $c->render(
     controller => 'sqliteviewerlite',
@@ -262,10 +268,10 @@ sub current_database { 'main' }
 sub show_primary_keys {
   my ($self, $database) = @_;
 
-  my $tables = $self->show_tables($database);
+  my $tables = $self->command->show_tables($database);
   my $primary_keys = {};
   for my $table (@$tables) {
-    my $primary_key = $self->show_primary_key($database, $table);
+    my $primary_key = $self->command->show_primary_key($database, $table);
     $primary_keys->{$table} = $primary_key;
   }
   return $primary_keys;
@@ -273,7 +279,7 @@ sub show_primary_keys {
 
 sub show_primary_key {
   my ($self, $database, $table) = @_;
-  my $show_create_table = $self->show_create_table($database, $table) || '';
+  my $show_create_table = $self->command->show_create_table($database, $table) || '';
   
   my @primary_keys = $self->dbi->dbh->primary_key(undef, $database, $table);
   my $primary_key = '(' . join(', ', @primary_keys) . ')';
@@ -283,11 +289,11 @@ sub show_primary_key {
 
 sub show_null_allowed_columns {
   my ($self, $database) = @_;
-  my $tables = $self->show_tables($database);
+  my $tables = $self->command->show_tables($database);
   my $null_allowed_columns = {};
   
   for my $table (@$tables) {
-    my $null_allowed_column = $self->show_null_allowed_column($database, $table);
+    my $null_allowed_column = $self->command->show_null_allowed_column($database, $table);
     $null_allowed_columns->{$table} = $null_allowed_column;
   }
   return $null_allowed_columns;
@@ -309,10 +315,10 @@ sub show_null_allowed_column {
 sub show_database_engines {
   my ($self, $database) = @_;
   
-  my $tables = $self->show_tables($database);
+  my $tables = $self->command->show_tables($database);
   my $database_engines = {};
   for my $table (@$tables) {
-    my $database_engine = $self->show_database_engine($database, $table);
+    my $database_engine = $self->command->show_database_engine($database, $table);
     $database_engines->{$table} = $database_engine;
   }
   
@@ -322,7 +328,7 @@ sub show_database_engines {
 sub show_database_engine {
   my ($self, $database, $table) = @_;
   
-  my $show_create_table = $self->show_create_table($database, $table) || '';
+  my $show_create_table = $self->command->show_create_table($database, $table) || '';
   my $database_engine = '';
   if ($show_create_table =~ /ENGINE=(.+?)(\s+|$)/i) {
     $database_engine = $1;
