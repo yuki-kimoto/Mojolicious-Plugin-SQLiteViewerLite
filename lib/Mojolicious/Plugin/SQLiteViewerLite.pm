@@ -1,82 +1,55 @@
 use 5.001001;
 package Mojolicious::Plugin::SQLiteViewerLite;
-use Mojo::Base 'Mojolicious::Plugin';
+use Mojo::Base 'Mojolicious::Plugin::SQLiteViewerLite::Base';
+use Mojolicious::Plugin::SQLiteViewerLite::Command;
 use DBIx::Custom;
 use Validator::Custom;
 use File::Basename 'dirname';
 use Cwd 'abs_path';
-use Mojolicious::Plugin::SQLiteViewerLite::Command;
 
-our $VERSION = '0.01';
-
-has 'prefix';
-has validator => sub {
-  my $validator = Validator::Custom->new;
-  $validator->register_constraint(
-    safety_name => sub {
-      my $name = shift;
-      return ($name || '') =~ /^\w+$/ ? 1 : 0;
-    }
-  );
-  return $validator;
-};
-
-has dbi => sub { DBIx::Custom->new };
+our $VERSION = '0.02';
 
 has command => sub {
   my $self = shift;
   my $commond = Mojolicious::Plugin::SQLiteViewerLite::Command->new(dbi => $self->dbi);
 };
 
-# Viewer
 sub register {
   my ($self, $app, $conf) = @_;
   my $dbh = $conf->{dbh};
   my $prefix = $conf->{prefix} // 'sqliteviewerlite';
   my $r = $conf->{route} // $app->routes;
-
+  
+  # Add template path
+  $self->add_template_path($app->renderer, __PACKAGE__);
+  
   # Set Attribute
   $self->dbi->dbh($dbh);
   $self->prefix($prefix);
   
-  # Add Renderer path
-  $self->add_renderer_path($app->renderer);
-  
-  $r = $self->create_routes($r,
+  # Routes
+  $r = $r->waypoint("/$prefix")->via('get')->to(
+    'sqliteviewerlite#default',
     namespace => 'Mojolicious::Plugin::SQLiteViewerLite',
-    controller => 'controller',
     plugin => $self,
     prefix => $self->prefix,
-    main_title => 'SQLite Viewer Lite'
+    main_title => 'SQLite Viewer Lite',
   );
-}
-
-sub add_renderer_path {
-  my ($self, $renderer) = @_;
-  my $class = __PACKAGE__;
-  $class =~ s/::/\//g;
-  $class .= '.pm';
-  my $public = abs_path dirname $INC{$class};
-  push @{$renderer->paths}, "$public/SQLiteViewerLite/templates";
-}
-
-sub create_routes {
-  my ($self, $r, %opt) = @_;
-  
-  my $prefix = $self->prefix;
-
-  # Routes
-  $r = $r->waypoint("/$prefix")->via('get')->to(%opt, action => 'default');
-  $r->get('/tables')->to(%opt, action => 'tables');
-  $r->get('/table')->to(%opt, action => 'table');
-  $r->get('/showcreatetables')->to(%opt, action => 'showcreatetables');
-  $r->get('/showprimarykeys')->to(%opt, action => 'showprimarykeys');
-  $r->get('/shownullallowedcolumns')->to(%opt, action => 'shownullallowedcolumns');
-  $r->get('/showdatabaseengines')->to(%opt, action => 'showdatabaseengines');
-  $r->get('/showcharsets')->to(%opt, action => 'showcharsets');
-  $r->get('/select')->to(%opt, action => 'select');
-
-  return $r;
+  $r->get('/tables')->to(
+    '#tables',
+    utilities => [
+      {path => 'showcreatetables', title => 'Show create tables'},
+      {path => 'showprimarykeys', title => 'Show primary keys'},
+      {path => 'shownullallowedcolumns', title => 'Show null allowed columns'},
+    ]
+  );
+  $r->get('/table')->to('#table');
+  $r->get('/showcreatetables')->to('#showcreatetables');
+  $r->get('/showprimarykeys')->to('#showprimarykeys');
+  $r->get('/shownullallowedcolumns')->to('#shownullallowedcolumns');
+  $r->get('/showdatabaseengines')->to('#showdatabaseengines');
+  $r->get('/showcharsets')->to('#showcharsets');
+  $r->get('/select')->to('#select');
 }
 
 1;
