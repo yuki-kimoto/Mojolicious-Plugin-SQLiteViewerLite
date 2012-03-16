@@ -80,7 +80,7 @@ $t->link_ok("/sqliteviewerlite/table?database=$database&table=table1");
 
 # Select page
 $t->get_ok("/sqliteviewerlite/select?database=$database&table=table1")
-  ->content_like(qr#\Qselect * from <i>table1</i> limit 0, 1000#)
+  ->content_like(qr#\Qselect * from <i>table1</i>#)
   ->content_like(qr/column1_1/)
   ->content_like(qr/column1_2/)
   ->content_like(qr/1/)
@@ -156,7 +156,7 @@ $t->link_ok("/other/table?database=$database&table=table1");
 
 # Select page
 $t->get_ok("/other/select?database=$database&table=table1")
-  ->content_like(qr#\Qselect * from <i>table1</i> limit 0, 1000#)
+  ->content_like(qr#\Qselect * from <i>table1</i>#)
   ->content_like(qr/column1_1/)
   ->content_like(qr/column1_2/)
   ->content_like(qr/1/)

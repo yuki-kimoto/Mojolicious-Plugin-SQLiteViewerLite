@@ -14,8 +14,6 @@ eval {
   $dbi->insert({key1 => $_, key2 => $_ + 1, key3 => $_ + 2}, table => 'table1') for (1 .. 1000);
 };
 
-warn $dbi->connector;
-
 plugin 'SQLiteViewerLite', connector => $dbi->connector, prefix => 'sqliteviewer';
 
 get '/' => {text => 'a'};
