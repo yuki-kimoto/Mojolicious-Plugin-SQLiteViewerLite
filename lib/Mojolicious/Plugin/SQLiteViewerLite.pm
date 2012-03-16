@@ -16,18 +16,20 @@ has command => sub {
 
 sub register {
   my ($self, $app, $conf) = @_;
+  
+  # Database
+  my $connector = $conf->{connector};
   my $dbh = $conf->{dbh};
-  my $prefix = $conf->{prefix} // 'sqliteviewerlite';
-  my $r = $conf->{route} // $app->routes;
+  if ($connector) { $self->dbi->connector($connector) }
+  else { $self->dbi->dbh($dbh) }
   
   # Add template path
   $self->add_template_path($app->renderer, __PACKAGE__);
   
-  # Set Attribute
-  $self->dbi->dbh($dbh);
-  $self->prefix($prefix);
-  
   # Routes
+  my $r = $conf->{route} // $app->routes;
+  my $prefix = $conf->{prefix} // 'sqliteviewerlite';
+  $self->prefix($prefix);
   $r = $r->waypoint("/$prefix")->via('get')->to(
     'sqliteviewerlite#default',
     namespace => 'Mojolicious::Plugin::SQLiteViewerLite',
@@ -72,6 +74,9 @@ Mojolicious::Plugin::SQLiteViewerLite - Mojolicious plugin to display SQLite dat
   # Prefix
   plugin 'SQLiteViewerLite', dbh => $dbh, prefix => 'sqliteviewerlite2';
 
+  # Using connection manager
+  plugin 'SQLiteViewerLite', connector => DBIx::Connector->connect(...);
+
 =head1 DESCRIPTION
 
 L<Mojolicious::Plugin::SQLiteViewerLite> is L<Mojolicious> plugin
@@ -100,6 +105,16 @@ Display C<primary keys> and C<null allowed columnes> in all tables.
 =back
 
 =head1 OPTIONS
+
+=head2 C<connector>
+
+  connector => $connector
+
+Connector object such as L<DBIx::Connector> to connect to database.
+
+  my $connector = DBIx::Connector->connect(...);
+
+Connector has C<dbh> method to get database handle
 
 =head2 C<dbh>
 
