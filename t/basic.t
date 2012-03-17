@@ -268,7 +268,7 @@ $t->get_ok("/sqliteviewerlite/select?database=$database&table=table_page&page=12
 $t->get_ok("/sqliteviewerlite/select?database=$database&table=table_page&page=36")
   ->content_like(qr#\Qselect * from <i>table_page</i>#)
   ->content_like(qr/3510/)
-  ->content_unlike(qr/16/)
+  ->content_unlike(qr/\b16\b/)
   ->content_like(qr/17/)
   ->content_like(qr/18/)
   ->content_like(qr/19/)
