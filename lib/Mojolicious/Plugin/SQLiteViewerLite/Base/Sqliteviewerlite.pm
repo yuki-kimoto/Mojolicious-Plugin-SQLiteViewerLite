@@ -187,8 +187,6 @@ sub select {
     $where->param({$column => $value});
   }
   
-  warn "$column $value";
-  
   # Limit
   my $page = $vresult->data->{page};
   my $count = 100;
