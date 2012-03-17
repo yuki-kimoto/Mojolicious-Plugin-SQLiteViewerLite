@@ -88,6 +88,15 @@ $t->get_ok("/sqliteviewerlite/select?database=$database&table=table1")
   ->content_like(qr/3/)
   ->content_like(qr/4/);
 
+# Select page
+$t->get_ok("/sqliteviewerlite/select?database=$database&table=table1&condition_column=column1_2&condition_value=4")
+  ->content_like(qr#\Qselect * from <i>table1</i>#)
+  ->content_like(qr/column1_1/)
+  ->content_like(qr/column1_2/)
+  ->content_unlike(qr/\b2\b/)
+  ->content_like(qr/\b3\b/)
+  ->content_like(qr/\b4\b/);
+
 # Show create tables page
 $t->get_ok("/sqliteviewerlite/showcreatetables?database=$database")
   ->content_like(qr/Create tables/)
