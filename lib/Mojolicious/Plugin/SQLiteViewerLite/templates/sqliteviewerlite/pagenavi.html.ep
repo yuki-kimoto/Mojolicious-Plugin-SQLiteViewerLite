@@ -32,7 +32,6 @@
         %   $navi_last_page += 1 - $navi_first_page;
         %   $navi_first_page = 1;
         % }
-        % warn "$navi_last_page $last_page";
         % if ($navi_last_page > $last_page) {
         %   $navi_last_page = $last_page;
         %   $navi_first_page = $navi_last_page - 19;

@@ -13,7 +13,7 @@ eval {
   $dbi->execute('drop table table1');
   $dbi->execute('create table table1 (key1 integer primary key not null, key2 not null, key3)');
   $dbi->connector->txn(sub {
-    $dbi->insert({key1 => $_, key2 => $_ + 1, key3 => $_ + 2}, table => 'table1') for (1 .. 900);
+    $dbi->insert({key1 => $_, key2 => $_ + 1, key3 => $_ + 2}, table => 'table1') for (1 .. 2510);
   });
 };
 
