@@ -107,6 +107,14 @@ $t->get_ok("/sqliteviewerlite/showcreatetables?database=$database")
   ->content_like(qr/column2_2/)
   ->content_like(qr/table3/);
 
+# Show select tables page
+$t->get_ok("/sqliteviewerlite/showselecttables?database=$database")
+  ->content_like(qr/Select tables/)
+  ->content_like(qr/table1/)
+  ->content_like(qr#\Q/select?#)
+  ->content_like(qr/table2/)
+  ->content_like(qr/table3/);
+
 # Show Primary keys page
 $t->get_ok("/sqliteviewerlite/showprimarykeys?database=$database")
   ->content_like(qr/Primary keys/)
