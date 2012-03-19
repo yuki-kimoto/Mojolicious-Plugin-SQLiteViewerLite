@@ -79,8 +79,8 @@ to display SQLite database information on browser
   plugin 'SQLiteViewerLite', dbh => $dbh, prefix => 'sqliteviewerlite2';
   
   # Route
-  my $brige = $app->route->under(sub {...});
-  plugin 'SQLiteViewerLite', dbh => $dbh, route => $brige;
+  my $bridge = $app->route->under(sub {...});
+  plugin 'SQLiteViewerLite', dbh => $dbh, route => $bridge;
 
   # Using connection manager object instead of "dbh"
   plugin 'SQLiteViewerLite', connector => DBIx::Connector->connect(...);
