@@ -157,7 +157,7 @@ Router, default to C<$app->routes>.
 
 It is useful when C<under> is used.
 
-  my $b = $r->under(sub { ... });
-  plugin 'SQLiteViewerLite', dbh => $dbh, route => $b;
+  my $bridge = $r->under(sub {...});
+  plugin 'SQLiteViewerLite', dbh => $dbh, route => $bridge;
 
 =cut
