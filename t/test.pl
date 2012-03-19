@@ -13,7 +13,7 @@ eval {
   $dbi->insert({key1 => $_, key2 => $_ + 1, key3 => $_ + 2}, table => 'table1') for (1 .. 2510);
 };
 
-plugin 'SQLiteViewerLite', dbh => $dbi->dbh, prefix => 'sqliteviewer';
+plugin 'SQLiteViewerLite', dbi => $dbi, prefix => 'sqliteviewer';
 
 get '/' => {text => 'a'};
 

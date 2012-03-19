@@ -5,7 +5,7 @@ use DBIx::Custom;
 use Test::Mojo;
 use Mojo::HelloWorld;
 
-plan skip => "required DBIx::Connector"
+plan skip_all => "required DBIx::Connector"
   unless eval { require DBIx::Connector; 1};
 
 plan 'no_plan';

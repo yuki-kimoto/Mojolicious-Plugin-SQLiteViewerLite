@@ -3,7 +3,6 @@ use strict;
 use warnings;
 use DBIx::Custom;
 use Test::Mojo;
-use Mojo::HelloWorld;
 
 {
   package Test::Mojo;
@@ -138,7 +137,7 @@ my $route_test;
       $route_test = 1;
       return 1;
     });
-    plugin 'SQLiteViewerLite', dbh => $dbi->dbh, route => $b, prefix => 'other';
+    plugin 'SQLiteViewerLite', dbi => $dbi, route => $b, prefix => 'other';
 }
 $app = Test2->new;
 $t = Test::Mojo->new($app);

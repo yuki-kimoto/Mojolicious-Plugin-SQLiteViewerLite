@@ -7,7 +7,7 @@ use Validator::Custom;
 use File::Basename 'dirname';
 use Cwd 'abs_path';
 
-our $VERSION = '0.03';
+our $VERSION = '0.05';
 
 has command => sub {
   my $self = shift;
@@ -18,9 +18,11 @@ sub register {
   my ($self, $app, $conf) = @_;
   
   # Database
+  my $dbi = $conf->{dbi};
   my $connector = $conf->{connector};
   my $dbh = $conf->{dbh};
-  if ($connector) { $self->dbi->connector($connector) }
+  if ($dbi) { $self->dbi($dbi) }
+  elsif ($connector) { $self->dbi->connector($connector) }
   else { $self->dbi->dbh($dbh) }
   
   # Add template path
@@ -58,11 +60,13 @@ sub register {
 
 =head1 NAME
 
-Mojolicious::Plugin::SQLiteViewerLite - Mojolicious plugin to display SQLite database information on browser
+Mojolicious::Plugin::SQLiteViewerLite - Mojolicious plugin
+to display SQLite database information on browser
 
 =head1 SYNOPSYS
 
   # Mojolicious::Lite
+  # (dbh is a database handle already connected to the database)
   plugin 'SQLiteViewerLite', dbh => $dbh;
 
   # Mojolicious
@@ -73,9 +77,16 @@ Mojolicious::Plugin::SQLiteViewerLite - Mojolicious plugin to display SQLite dat
   
   # Prefix
   plugin 'SQLiteViewerLite', dbh => $dbh, prefix => 'sqliteviewerlite2';
+  
+  # Route
+  my $brige = $app->route->under(sub {...});
+  plugin 'SQLiteViewerLite', dbh => $dbh, route => $brige;
 
-  # Using connection manager
+  # Using connection manager object instead of "dbh"
   plugin 'SQLiteViewerLite', connector => DBIx::Connector->connect(...);
+
+  # Using DBIx::Custom object instead of "dbh"
+  plugin 'SQLiteViewerLite', dbi => DBIx::Custom->connect(...);
 
 =head1 DESCRIPTION
 
@@ -96,7 +107,7 @@ Display C<show create table>
 
 =item *
 
-Select * from TABLE limit 0, 1000
+Select * from TABLE
 
 =item *
 
@@ -111,6 +122,7 @@ Display C<primary keys> and C<null allowed columnes> in all tables.
   connector => $connector
 
 Connector object such as L<DBIx::Connector> to connect to database.
+You can use this instead of C<dbh> option.
 
   my $connector = DBIx::Connector->connect(...);
 
@@ -120,7 +132,16 @@ Connector has C<dbh> method to get database handle
 
   dbh => $dbh
 
-Database handle object in L<DBI>.
+dbh is a L<DBI> database handle already connected to the database.
+
+  my $dbh = DBI->connect(...);
+
+=head2 C<dbi>
+
+  dbi => DBIx::Custom->connect(...);
+
+L<DBIx::Custom> object.
+you can use this instead of C<dbh> option.
 
 =head2 C<prefix>
 
