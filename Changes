@@ -1,20 +1,21 @@
+0.08
+  - improved show create table page design.
+  - improved select page design. 
 0.07
-  - improved design. 
-0.07
-  - work on Perl 5.008007
+  - work on Perl 5.008007.
 0.06
-  - improved design
-  - added show select tables page
+  - improved design.
+  - added show select tables page.
 0.05
-  - improved test
+  - improved test.
 0.04
-  - fixed testing bug
-  - added dbi option
+  - fixed testing bug.
+  - added dbi option.
 0.03
-  - added simple table search
-  - added connector option
-  - added page navigation
+  - added simple table search.
+  - added connector option.
+  - added page navigation.
 0.02
-  - cleanup modules
+  - cleanup modules.
 0.01
   - First release.
