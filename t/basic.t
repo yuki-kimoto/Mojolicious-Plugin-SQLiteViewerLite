@@ -208,6 +208,7 @@ $dbi->insert({column_a => 'a', column_b => 'b'}, table => 'table_page') for (1 .
 
 $t->get_ok("/sqliteviewerlite/select?database=$database&table=table_page")
   ->content_like(qr#\Qselect * from <i>table_page</i>#)
+  ->content_like(qr/1 to 100/)
   ->content_like(qr/3510/)
   ->content_like(qr/1/)
   ->content_like(qr/2/)
@@ -283,6 +284,7 @@ $t->get_ok("/sqliteviewerlite/select?database=$database&table=table_page&page=12
 
 $t->get_ok("/sqliteviewerlite/select?database=$database&table=table_page&page=36")
   ->content_like(qr#\Qselect * from <i>table_page</i>#)
+  ->content_like(qr/3501 to 3510/)
   ->content_like(qr/3510/)
   ->content_unlike(qr/\b16\b/)
   ->content_like(qr/17/)

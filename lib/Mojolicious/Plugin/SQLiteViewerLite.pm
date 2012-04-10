@@ -1,4 +1,4 @@
-use 5.001001;
+use 5.008007;
 package Mojolicious::Plugin::SQLiteViewerLite;
 use Mojo::Base 'Mojolicious::Plugin::SQLiteViewerLite::Base';
 use Mojolicious::Plugin::SQLiteViewerLite::Command;
@@ -7,7 +7,7 @@ use Validator::Custom;
 use File::Basename 'dirname';
 use Cwd 'abs_path';
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 has command => sub {
   my $self = shift;
@@ -62,8 +62,7 @@ sub register {
 
 =head1 NAME
 
-Mojolicious::Plugin::SQLiteViewerLite - Mojolicious plugin
-to display SQLite database information on browser
+Mojolicious::Plugin::SQLiteViewerLite - Mojolicious plugin to display SQLite database information on browser
 
 =head1 SYNOPSYS
 
