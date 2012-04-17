@@ -7,7 +7,7 @@ use Validator::Custom;
 use File::Basename 'dirname';
 use Cwd 'abs_path';
 
-our $VERSION = '0.08';
+our $VERSION = '0.09';
 
 has command => sub {
   my $self = shift;

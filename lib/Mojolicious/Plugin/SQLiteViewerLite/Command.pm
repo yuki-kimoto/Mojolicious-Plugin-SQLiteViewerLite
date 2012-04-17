@@ -64,7 +64,7 @@ select distinct(name)
   order by name;
 EOS
 
-  my $tables = $self->dbi->execute($sql)->column;
+  my $tables = $self->dbi->execute($sql)->values;
   
   return $tables;
 }
