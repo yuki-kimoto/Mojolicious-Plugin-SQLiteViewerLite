@@ -7,7 +7,7 @@ use Validator::Custom;
 use File::Basename 'dirname';
 use Cwd 'abs_path';
 
-our $VERSION = '0.09';
+our $VERSION = '0.10';
 
 has command => sub {
   my $self = shift;
@@ -32,30 +32,34 @@ sub register {
   my $r = $conf->{route} // $app->routes;
   my $prefix = $conf->{prefix} // 'sqliteviewerlite';
   $self->prefix($prefix);
-  $r = $r->waypoint("/$prefix")->via('get')->to(
-    'sqliteviewerlite#default',
-    namespace => 'Mojolicious::Plugin::SQLiteViewerLite',
-    plugin => $self,
-    prefix => $self->prefix,
-    main_title => 'SQLite Viewer Lite',
-  );
-  $r->get('/tables')->to(
-    '#tables',
-    utilities => [
-      {path => 'showcreatetables', title => 'Show create tables'},
-      {path => 'showselecttables', title => 'Show select tables'},
-      {path => 'showprimarykeys', title => 'Show primary keys'},
-      {path => 'shownullallowedcolumns', title => 'Show null allowed columns'},
-    ]
-  );
-  $r->get('/table')->to('#table');
-  $r->get('/showcreatetables')->to('#showcreatetables');
-  $r->get('/showselecttables')->to('#showselecttables');
-  $r->get('/showprimarykeys')->to('#showprimarykeys');
-  $r->get('/shownullallowedcolumns')->to('#shownullallowedcolumns');
-  $r->get('/showdatabaseengines')->to('#showdatabaseengines');
-  $r->get('/showcharsets')->to('#showcharsets');
-  $r->get('/select')->to('#select');
+  {
+    my $r = $r->route("/$prefix")->to(
+      'sqliteviewerlite#',
+      namespace => 'Mojolicious::Plugin::SQLiteViewerLite',
+      plugin => $self,
+      prefix => $self->prefix,
+      main_title => 'SQLite Viewer Lite',
+    );
+    
+    $r->get('/')->to('#default');
+    $r->get('/tables')->to(
+      '#tables',
+      utilities => [
+        {path => 'showcreatetables', title => 'Show create tables'},
+        {path => 'showselecttables', title => 'Show select tables'},
+        {path => 'showprimarykeys', title => 'Show primary keys'},
+        {path => 'shownullallowedcolumns', title => 'Show null allowed columns'},
+      ]
+    );
+    $r->get('/table')->to('#table');
+    $r->get('/showcreatetables')->to('#showcreatetables');
+    $r->get('/showselecttables')->to('#showselecttables');
+    $r->get('/showprimarykeys')->to('#showprimarykeys');
+    $r->get('/shownullallowedcolumns')->to('#shownullallowedcolumns');
+    $r->get('/showdatabaseengines')->to('#showdatabaseengines');
+    $r->get('/showcharsets')->to('#showcharsets');
+    $r->get('/select')->to('#select');
+  }
 }
 
 1;
