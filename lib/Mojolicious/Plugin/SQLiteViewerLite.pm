@@ -7,7 +7,7 @@ use Validator::Custom;
 use File::Basename 'dirname';
 use Cwd 'abs_path';
 
-our $VERSION = '0.10';
+our $VERSION = '0.11';
 
 has command => sub {
   my $self = shift;
@@ -67,6 +67,16 @@ sub register {
 =head1 NAME
 
 Mojolicious::Plugin::SQLiteViewerLite - Mojolicious plugin to display SQLite database information on browser
+
+=head1 CAUTION
+
+B<L<Mojolicious::Plugin::SQLiteViewerLite> is merged into L<Mojolicious::Plugin::DBViewer>>.
+
+B<This module is DEPRECATED and will be removed from CPAN in 2018/4/1>.
+
+But you get it on github.
+
+  https://github.com/yuki-kimoto/Mojolicious-Plugin-SQLiteViewerLite
 
 =head1 SYNOPSYS
 
