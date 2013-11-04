@@ -7,7 +7,7 @@ use Validator::Custom;
 use File::Basename 'dirname';
 use Cwd 'abs_path';
 
-our $VERSION = '0.11';
+our $VERSION = '0.12';
 
 has command => sub {
   my $self = shift;
@@ -25,8 +25,9 @@ sub register {
   elsif ($connector) { $self->dbi->connector($connector) }
   else { $self->dbi->dbh($dbh) }
   
-  # Add template path
+  # Add template and public path
   $self->add_template_path($app->renderer, __PACKAGE__);
+  $self->add_static_path($app->static, __PACKAGE__);
   
   # Routes
   my $r = $conf->{route} // $app->routes;
