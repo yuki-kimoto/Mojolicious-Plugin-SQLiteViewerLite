@@ -1,3 +1,7 @@
+0.14
+  - fix test bag when DBIx::Custom is upgraded to 0.40
+0.13
+  - fix bug that this module don't work in latest Mojolicious.
 0.12 (DEPRECATED)
   - fix test bug.
 0.11 (DEPRECATED)

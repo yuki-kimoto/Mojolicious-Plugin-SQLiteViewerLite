@@ -53,7 +53,7 @@ $dbi->insert({column1_1 => 3, column1_2 => 4}, table => 'table1');
 {
     package Test1;
     use Mojolicious::Lite;
-    plugin 'SQLiteViewerLite', dbh => $dbi->dbh;
+    plugin 'SQLiteViewerLite', dbi => $dbi;
 }
 my $app = Test1->new;
 my $t = Test::Mojo->new($app);
