@@ -21,4 +21,14 @@ WriteMakefile(
     },
     dist                => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean               => { FILES => 'Mojolicious-Plugin-SQLiteViewerLite-*' },
+    META_MERGE => {
+        'meta-spec' => { version => 2 },
+        resources   => {
+            repository => {
+                type => 'git',
+                url  => 'https://github.com/yuki-kimoto/Mojolicious-Plugin-SQLiteViewerLite.git',
+                web  => 'https://github.com/yuki-kimoto/Mojolicious-Plugin-SQLiteViewerLite',
+            },
+        },
+    },
 );
